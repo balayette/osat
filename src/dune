@@ -1,0 +1,4 @@
+(executable
+    (name osat)
+    (preprocess (pps ppx_deriving ppx_deriving.show)))
+

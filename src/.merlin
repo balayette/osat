@@ -1,0 +1,8 @@
+B /home/nicolas/.opam/occ2/lib/ppx_deriving
+B /home/nicolas/.opam/occ2/lib/result
+B ../_build/default/src/.osat.eobjs
+S /home/nicolas/.opam/occ2/lib/ppx_deriving
+S /home/nicolas/.opam/occ2/lib/result
+S .
+FLG -ppx '/home/nicolas/Documents/Prog/OSAT/_build/default/.ppx/ppx_deriving+ppx_deriving.show/ppx.exe --as-ppx'
+FLG -w @a-4-29-40-41-42-44-45-48-58-59-60-40 -strict-sequence -strict-formats -short-paths -keep-locs
