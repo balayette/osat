@@ -24,3 +24,31 @@ let rec assign_variable name value = function
   | Or (e1, e2) -> Or(assign_variable name value e1, assign_variable name value e2)
   | Not (e1) -> Not(assign_variable name value e1)
   | x -> x
+
+let rec optimize = function
+    And (LogicalValue true, e) | And (e, LogicalValue true) -> e
+  | And (LogicalValue false, _) | And (_, LogicalValue false) -> LogicalValue false
+  | Or (LogicalValue true, _) | Or (_, LogicalValue true)-> LogicalValue true
+  | Not (LogicalValue x) -> LogicalValue (not x)
+  | And (e1, e2) -> And(optimize e1, optimize e2) |> optimize
+  | Or (e1, e2) -> Or(optimize e1, optimize e2) |> optimize
+  | Not (e) -> Not(optimize e)
+  | x -> x
+
+let () = 
+    let expr = And 
+    (
+        Or 
+        (
+            LogicalValue true, 
+            Variable "a"
+        ), 
+        And 
+        (
+            Not(Variable "e"), 
+            Not(LogicalValue false)
+        )
+    )
+    in 
+    show_boolean_expression (expr) |> print_endline;
+    optimize expr |> show_boolean_expression |> print_endline
