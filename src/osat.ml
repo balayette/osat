@@ -85,7 +85,7 @@ and optimize_not = function
 let rec df_satisfied e =
   match find_free_variable e with
   | None -> (
-    match e with
+    match optimize e with
     | LogicalValue b -> b
     | _ -> pretty_print e ; failwith "Impossible" )
   | Some s ->
