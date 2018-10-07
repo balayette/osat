@@ -82,13 +82,23 @@ and optimize_not = function
       match oe with LogicalValue _ -> optimize_not (Not oe) | _ -> Not oe )
   | _ -> failwith "Can't happen"
 
-let rec df_satisfied e =
-  match find_free_variable e with
-  | None -> (
-    match optimize e with
-    | LogicalValue b -> b
-    | _ -> pretty_print e ; failwith "Impossible" )
-  | Some s ->
-      let exp_true = assign_variable s true e |> optimize
-      and exp_false = assign_variable s false e |> optimize in
-      df_satisfied exp_true || df_satisfied exp_false
+let df_satisfied e =
+  let rec aux e =
+    match find_free_variable e with
+    | None -> (
+      match e with LogicalValue b -> b | _ -> failwith "Impossible" )
+    | Some s -> (
+        let exp_true = assign_variable s true e |> optimize
+        and exp_false = assign_variable s false e |> optimize in
+        match aux exp_true with
+        | true ->
+            Printf.printf "%s = true\n" s ;
+            true
+        | _ -> (
+          match aux exp_false with
+          | true ->
+              Printf.printf "%s = false\n" s ;
+              true
+          | _ -> false ) )
+  in
+  aux (optimize e)
