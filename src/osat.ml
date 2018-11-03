@@ -1,36 +1,38 @@
+open Sexplib.Std
+
 type t =
   | Variable of string
   | LogicalValue of bool
   | And of t * t
   | Or of t * t
   | Not of t
-[@@deriving show]
+[@@deriving show, sexp]
 
 let pretty_print e =
   let rec print = function
     | And (e1, e2) ->
-        print_string "(" ;
-        print e1 ;
-        print_string " ∧ " ;
-        print e2 ;
-        print_string ")"
+      print_string "(" ;
+      print e1 ;
+      print_string " ∧ " ;
+      print e2 ;
+      print_string ")"
     | Or (e1, e2) ->
-        print_string "(" ;
-        print e1 ;
-        print_string " ∨ " ;
-        print e2 ;
-        print_string ")"
+      print_string "(" ;
+      print e1 ;
+      print_string " ∨ " ;
+      print e2 ;
+      print_string ")"
     | Variable s -> Printf.printf "'%s'" s
     | LogicalValue b ->
-        Printf.printf "%s" (match b with true -> "true" | _ -> "false")
+      Printf.printf "%s" (match b with true -> "true" | _ -> "false")
     | Not e ->
-        print_string "¬" ; print_string "(" ; print e ; print_string ")"
+      print_string "¬" ; print_string "(" ; print e ; print_string ")"
   in
   print e ; print_endline ""
 
 let rec find_free_variable expr =
   let first e1 e2 =
-    match (e1, e2) with Some e, _ -> Some e | _, Some e -> Some e | _ -> None
+    match (e1, e2) with Some e, _ | _, Some e -> Some e | _ -> None
   in
   match expr with
   | Variable s -> Some s
@@ -57,7 +59,7 @@ let rec optimize = function
 and optimize_and = function
   | And (LogicalValue true, e) | And (e, LogicalValue true) -> e
   | And (LogicalValue false, _) | And (_, LogicalValue false) ->
-      LogicalValue false
+    LogicalValue false
   | And (e1, e2) -> (
       let oe1 = optimize e1 and oe2 = optimize e2 in
       match (oe1, oe2) with
@@ -86,19 +88,15 @@ let df_satisfied e =
   let rec aux e =
     match find_free_variable e with
     | None -> (
-      match e with LogicalValue b -> b | _ -> failwith "Impossible" )
+        match e with LogicalValue b -> b | _ -> failwith "Impossible" )
     | Some s -> (
-        let exp_true = assign_variable s true e |> optimize
-        and exp_false = assign_variable s false e |> optimize in
-        match aux exp_true with
-        | true ->
-            Printf.printf "%s = true\n" s ;
-            true
+        match assign_variable s true e |> optimize |> aux with
+          true -> Printf.printf "%s = true\n" s; true
         | _ -> (
-          match aux exp_false with
-          | true ->
+            match assign_variable s false e |> optimize |> aux with
+            | true ->
               Printf.printf "%s = false\n" s ;
               true
-          | _ -> false ) )
+            | _ -> false ))
   in
   aux (optimize e)

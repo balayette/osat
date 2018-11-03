@@ -1,13 +1,13 @@
 open Osat
 
-let () = 
-  let expr = 
+let () =
+  let expr =
     And
       (
-        And 
+        And
           (
-            Not (LogicalValue false),
-            Variable "a"
+            Not (Variable "d"),
+            (Variable "a")
           ),
         Or
           (
@@ -19,7 +19,7 @@ let () =
             )
           )
       )
-  in 
+  in
   expr |> pretty_print;
   optimize expr |> pretty_print;
-  match  df_satisfied expr with true -> Printf.printf "SAT\n" | _ -> Printf.printf "UNSAT\n"
+  match  df_satisfied (optimize expr) with true -> Printf.printf "SAT\n" | _ -> Printf.printf "UNSAT\n"

@@ -1,10 +1,10 @@
-type t = 
+type t =
     Variable of string
   | LogicalValue of bool
   | And of t * t
   | Or of t * t
   | Not of t
-[@@deriving show]
+[@@deriving show, sexp]
 
 val pretty_print : t -> unit
 
